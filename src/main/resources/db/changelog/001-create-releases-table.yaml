@@ -44,11 +44,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
-        - addCheckConstraint:
-            tableName: releases
-            constraintName: chk_release_status
-            validate: true
-            constraintBody: "status IN ('CREATED', 'IN_DEVELOPMENT', 'ON_DEV', 'QA_DONE_ON_DEV', 'ON_STAGING', 'QA_DONE_ON_STAGING', 'ON_PROD', 'DONE')"
+        - sql:
+            comment: "Add check constraint for valid status values"
+            sql: |
+              ALTER TABLE releases 
+              ADD CONSTRAINT chk_release_status 
+              CHECK (status IN ('CREATED', 'IN_DEVELOPMENT', 'ON_DEV', 'QA_DONE_ON_DEV', 
+                                'ON_STAGING', 'QA_DONE_ON_STAGING', 'ON_PROD', 'DONE'))
 
         - createIndex:
             indexName: idx_releases_status
