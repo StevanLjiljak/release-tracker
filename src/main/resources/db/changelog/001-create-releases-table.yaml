@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: release-tracker
+      comment: "Create releases table with indexes"
+      changes:
+        - createTable:
+            tableName: releases
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(1000)
+              - column:
+                  name: status
+                  type: varchar(50)
+                  defaultValue: CREATED
+                  constraints:
+                    nullable: false
+              - column:
+                  name: release_date
+                  type: date
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_updated_at
+                  type: timestamptz
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+
+        - addCheckConstraint:
+            tableName: releases
+            constraintName: chk_release_status
+            validate: true
+            constraintBody: "status IN ('CREATED', 'IN_DEVELOPMENT', 'ON_DEV', 'QA_DONE_ON_DEV', 'ON_STAGING', 'QA_DONE_ON_STAGING', 'ON_PROD', 'DONE')"
+
+        - createIndex:
+            indexName: idx_releases_status
+            tableName: releases
+            columns:
+              - column:
+                  name: status
+
+        - createIndex:
+            indexName: idx_releases_release_date
+            tableName: releases
+            columns:
+              - column:
+                  name: release_date
+
+        - createIndex:
+            indexName: idx_releases_name
+            tableName: releases
+            columns:
+              - column:
+                  name: name
